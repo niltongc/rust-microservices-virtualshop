@@ -1,8 +1,9 @@
 use actix_web::{App, HttpServer};
 
-mod route_config;
 use crate::route_config::route_config;
 
+mod route_config;
+mod handlers;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
