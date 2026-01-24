@@ -1,13 +1,14 @@
 
 use actix_web::web;
 
-use crate::handlers::product::{hello, manual_hello, get_product_by_id};
+use crate::handlers::product::{hello, get_product_by_id, get_all_product, create_product};
 
 pub fn route_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("")
             .service(hello)
             .service(get_product_by_id)
-            .route("/hey", web::get().to(manual_hello))
+            .service(get_all_product)
+            .service(create_product)
     );
 }
