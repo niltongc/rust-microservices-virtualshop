@@ -17,7 +17,7 @@ struct AppState {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("before server");
+    println!("rust api started");
 
     dotenv().ok();
 
@@ -37,11 +37,8 @@ async fn main() -> std::io::Result<()> {
         .expect("PORT not found")
         .parse()
         .expect("PORT must be a number");
+
     println!("running at {}:{}", host, port);
-
-    println!("running at {}:{}",host,port);
-
-        println!("after print");
 
     HttpServer::new(move || {
         App::new()

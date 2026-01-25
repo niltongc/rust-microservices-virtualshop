@@ -1,5 +1,5 @@
 use actix_web::web::Json;
-use actix_web::{HttpResponse, Responder, get, post, web};
+use actix_web::{HttpResponse, Responder, get, post, put, web};
 
 use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{ActiveModelTrait, EntityTrait};
@@ -15,6 +15,7 @@ pub struct ProductDto {
     pub id: i32,
     pub name: String,
     pub price: Decimal,
+    pub description: String,
 }
 
 impl From<products::Model> for ProductDto {
@@ -23,6 +24,7 @@ impl From<products::Model> for ProductDto {
             id: model.id,
             name: model.name,
             price: model.price,
+            description: model.description
         }
     }
 }
@@ -102,9 +104,66 @@ pub async fn create_product(
     }
 }
 
+#[derive(serde::Deserialize)]
+pub struct UpdateProductDto{
+    name: Option<String>,
+    price: Option<Decimal>,
+    description: Option<String>,
+    stock: Option<i64>,
+    image_url: Option<String>,
+    category_id: Option<i32>
+}
+
+#[put("/product/{id}")]
+pub async fn update_product(
+    data: web::Data<AppState>,
+    path: web::Path<i32>,
+    product_data: Json<UpdateProductDto>,
+) -> impl Responder {
+    let id = path.into_inner();
+
+    let product = match Products::find_by_id(id).one(&data.db).await {
+        Ok(Some(p)) => p,
+        Ok(None) => return HttpResponse::NotFound().body("Product not found"),
+        Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
+
+    let mut active_product: products::ActiveModel = product.into();
+
+    if let Some(name) = &product_data.name {
+        active_product.name = Set(name.clone());
+    }
+
+    if let Some(price) = &product_data.price {
+        active_product.price = Set(price.clone());
+    }
+
+    if let Some(description) = &product_data.description {
+        active_product.description = Set(description.clone());
+    }
+
+    if let Some(stock) = &product_data.stock {
+        active_product.stock = Set(stock.clone());
+    }
+
+    if let Some(image_url) = &product_data.image_url {
+        active_product.image_url = Set(image_url.clone());
+    }
+
+    if let Some(category_id) = &product_data.category_id {
+        active_product.category_id = Set(category_id.clone());
+    }
+
+    match active_product.update(&data.db).await {
+        Ok(updated_product) => HttpResponse::Ok().json(updated_product),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
+
+
+}
+
     // pub id: i32,
     // pub name: String,
-    // #[sea_orm(column_type = "Decimal(Some((10, 0)))")]
     // pub price: Decimal,
     // pub description: String,
     // pub stock: i64,
