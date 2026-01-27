@@ -1,7 +1,7 @@
 
 use actix_web::web;
 
-use crate::handlers::product::{hello, get_product_by_id, get_all_product, create_product, update_product};
+use crate::handlers::product::{hello, get_product_by_id, get_all_product, create_product, update_product,delete_product};
 
 pub fn route_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -11,5 +11,6 @@ pub fn route_config(cfg: &mut web::ServiceConfig) {
             .service(get_all_product)
             .service(create_product)
             .service(update_product)
+            .service(delete_product)
     );
 }
