@@ -9,6 +9,7 @@ use serde::Serialize;
 use crate::entity::{prelude::*, products};
 
 use crate::AppState;
+use crate::services::product_services::ProductService;
 
 #[derive(Debug, Serialize)]
 pub struct ProductDto {
@@ -40,6 +41,23 @@ pub async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
+// #[get("/product/{id}")]
+// pub async fn get_product_by_id(
+//     data: web::Data<AppState>,
+//     path: web::Path<i32>,
+// ) -> impl Responder {
+//     let id = path.into_inner();
+
+//     match Products::find_by_id(id).one(&data.db).await {
+//         Ok(Some(product)) => {
+//             let dto = ProductDto::from(product);
+//             HttpResponse::Ok().json(dto)
+//         }
+//         Ok(None) => HttpResponse::NotFound().body("Product not found"),
+//         Err(_) => HttpResponse::InternalServerError().finish(),
+//     }
+// }
+
 #[get("/product/{id}")]
 pub async fn get_product_by_id(
     data: web::Data<AppState>,
@@ -47,27 +65,32 @@ pub async fn get_product_by_id(
 ) -> impl Responder {
     let id = path.into_inner();
 
-    match Products::find_by_id(id).one(&data.db).await {
-        Ok(Some(product)) => {
-            let dto = ProductDto::from(product);
-            HttpResponse::Ok().json(dto)
-        }
+    match ProductService::get_by_id(&data.db, id).await {
+        Ok(Some(product)) => HttpResponse::Ok().json(product),
         Ok(None) => HttpResponse::NotFound().body("Product not found"),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
 
+// #[get("/product")]
+// pub async fn get_all_product(data: web::Data<AppState>) -> impl Responder{
+//     match Products::find().all(&data.db).await {
+//         Ok(products) => {
+//             let dto: Vec<ProductDto> = products
+//                 .into_iter()
+//                 .map(ProductDto::from)
+//                 .collect();
+
+//             HttpResponse::Ok().json(dto)
+//         }
+//         Err(_) => HttpResponse::InternalServerError().finish(),
+//     }
+// }
+
 #[get("/product")]
 pub async fn get_all_product(data: web::Data<AppState>) -> impl Responder{
-    match Products::find().all(&data.db).await {
-        Ok(products) => {
-            let dto: Vec<ProductDto> = products
-                .into_iter()
-                .map(ProductDto::from)
-                .collect();
-
-            HttpResponse::Ok().json(dto)
-        }
+    match ProductService::get_all_product(&data.db).await {
+        Ok(products) => HttpResponse::Ok().json(products),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }

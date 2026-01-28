@@ -10,6 +10,7 @@ use crate::route_config::route_config;
 mod route_config;
 mod handlers;
 mod entity;
+mod services;
 
 struct AppState {
     db: DatabaseConnection,
