@@ -1,11 +1,10 @@
 use actix_web::web::Json;
 use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
 
-use sea_orm::{EntityTrait};
 use sea_orm::prelude::Decimal;
 use serde::Serialize;
 
-use crate::entity::{prelude::*, products};
+use crate::entity::{products};
 
 use crate::AppState;
 use crate::services::product_services::{ProductService};
@@ -212,6 +211,22 @@ pub async fn update_product(
 
 }
 
+// #[delete("/product/{id}")]
+// pub async fn delete_product(
+//     data: web::Data<AppState>,
+//     path: web::Path<i32>
+// ) -> impl Responder{
+//     let id = path.into_inner();
+
+//     match Products::delete_by_id(id).exec(&data.db).await{
+//         Ok(result) if result.rows_affected == 1 => {
+//             HttpResponse::NoContent().finish()
+//         }
+//         Ok(_) => HttpResponse::NotFound().body("Product not found"),
+//         Err(_) => HttpResponse::InternalServerError().finish(),
+//     }
+// }
+
 #[delete("/product/{id}")]
 pub async fn delete_product(
     data: web::Data<AppState>,
@@ -219,11 +234,9 @@ pub async fn delete_product(
 ) -> impl Responder{
     let id = path.into_inner();
 
-    match Products::delete_by_id(id).exec(&data.db).await{
-        Ok(result) if result.rows_affected == 1 => {
-            HttpResponse::NoContent().finish()
-        }
-        Ok(_) => HttpResponse::NotFound().body("Product not found"),
+    match ProductService::delete_product(&data.db,id).await{
+        Ok(true) => HttpResponse::NoContent().finish(),
+        Ok(false) => HttpResponse::NotFound().body("Product not found"),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }

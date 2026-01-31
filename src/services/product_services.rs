@@ -1,6 +1,6 @@
 
 use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{ActiveModelTrait, EntityTrait};
+use sea_orm::{ActiveModelTrait, DbErr, EntityTrait};
 use sea_orm::{DatabaseConnection};
 
 use crate::handlers::product::{CreateProductDto, UpdateProductDto};
@@ -89,6 +89,17 @@ impl ProductService {
         let updated_product = active_product.update(db).await?;
 
         Ok(Some(ProductDto::from(updated_product)))
+    }
+
+    pub async fn delete_product(
+        db: &DatabaseConnection,
+        id: i32
+    ) -> Result<bool, DbErr> {
+        let result = Products::delete_by_id(id)
+            .exec(db)
+            .await?;
+
+        Ok(result.rows_affected == 1)
     }
 
 
