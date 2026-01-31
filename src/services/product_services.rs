@@ -1,8 +1,9 @@
-use sea_orm::ActiveValue::Set;
+
+use sea_orm::ActiveValue::{NotSet, Set};
 use sea_orm::{ActiveModelTrait, EntityTrait};
 use sea_orm::{DatabaseConnection};
 
-use crate::handlers::product::UpdateProductDto;
+use crate::handlers::product::{CreateProductDto, UpdateProductDto};
 use crate::{handlers::product::ProductDto};
 use crate::entity::{prelude::*, products};
 
@@ -25,6 +26,25 @@ impl ProductService {
         let products = Products::find().all(db).await?;
 
         Ok(products.into_iter().map(ProductDto::from).collect())
+    }
+
+    pub async fn create_product(
+        db: &DatabaseConnection,
+        product_data: CreateProductDto
+    ) -> Result<ProductDto, sea_orm::DbErr>{
+        let new_product = products::ActiveModel {
+            id: NotSet,
+            name: Set(product_data.name.clone()),
+            price: Set(product_data.price.clone()),
+            description: Set(product_data.description.clone()),
+            stock: Set(product_data.stock.clone()),
+            image_url: Set(product_data.image_url.clone()),
+            category_id: Set(product_data.category_id.clone()),
+        };
+
+        let product_created = new_product.insert(db).await?;
+
+        Ok(ProductDto::from(product_created))
     }
 
     pub async fn update_product(

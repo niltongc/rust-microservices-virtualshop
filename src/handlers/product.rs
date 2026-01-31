@@ -1,15 +1,14 @@
 use actix_web::web::Json;
 use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
 
-use sea_orm::ActiveValue::{NotSet, Set};
-use sea_orm::{ActiveModelTrait, EntityTrait};
+use sea_orm::{EntityTrait};
 use sea_orm::prelude::Decimal;
 use serde::Serialize;
 
 use crate::entity::{prelude::*, products};
 
 use crate::AppState;
-use crate::services::product_services::ProductService;
+use crate::services::product_services::{ProductService};
 
 #[derive(Debug, Serialize)]
 pub struct ProductDto {
@@ -96,7 +95,7 @@ pub async fn get_all_product(data: web::Data<AppState>) -> impl Responder{
 }
 
 #[derive(serde::Deserialize)]
-pub struct CreateUserDto{
+pub struct CreateProductDto{
 
     pub name: String,
     pub price: Decimal,
@@ -106,22 +105,35 @@ pub struct CreateUserDto{
     pub category_id: i32,
 }
 
+// #[post("/product")]
+// pub async fn create_product(
+//     data: web::Data<AppState>,
+//     product_data: Json<CreateProductDto>
+// ) -> impl Responder {
+//     let new_product = products::ActiveModel {
+//         id: NotSet,
+//         name: Set(product_data.name.clone()),
+//         price: Set(product_data.price.clone()),
+//         description: Set(product_data.description.clone()),
+//         stock: Set(product_data.stock.clone()),
+//         image_url: Set(product_data.image_url.clone()),
+//         category_id: Set(product_data.category_id.clone()),
+//     };
+
+//     match new_product.insert(&data.db).await {
+//         Ok(product) => HttpResponse::Created().json(product),
+//         Err(_) => HttpResponse::InternalServerError().finish(),
+//     }
+// }
+
 #[post("/product")]
 pub async fn create_product(
     data: web::Data<AppState>,
-    product_data: Json<CreateUserDto>
+    product_data: Json<CreateProductDto>
 ) -> impl Responder {
-    let new_product = products::ActiveModel {
-        id: NotSet,
-        name: Set(product_data.name.clone()),
-        price: Set(product_data.price.clone()),
-        description: Set(product_data.description.clone()),
-        stock: Set(product_data.stock.clone()),
-        image_url: Set(product_data.image_url.clone()),
-        category_id: Set(product_data.category_id.clone()),
-    };
+    let product_data = product_data.into_inner();
 
-    match new_product.insert(&data.db).await {
+    match ProductService::create_product(&data.db, product_data).await {
         Ok(product) => HttpResponse::Created().json(product),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
