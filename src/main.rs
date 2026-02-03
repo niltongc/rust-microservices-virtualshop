@@ -11,6 +11,7 @@ mod route_config;
 mod handlers;
 mod entity;
 mod services;
+mod repositories;
 
 struct AppState {
     db: DatabaseConnection,
