@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-actix-api-config
+  namespace: vshop
+data:
+  HOST: "0.0.0.0"
+  PORT: "8080"
