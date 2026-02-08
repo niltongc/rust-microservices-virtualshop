@@ -3,7 +3,8 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, DbErr, EntityTrait};
 
 use crate::entity::products::{self};
 use crate::entity::{prelude::*};
-use crate::handlers::product::{CreateProductDto, UpdateProductDto};
+use crate::handlers::product::{UpdateProductDto};
+use crate::application::dtos::products::create_product_dto::*;
 
 pub struct ProductRepository;
 

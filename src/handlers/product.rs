@@ -7,7 +7,8 @@ use serde::Serialize;
 use crate::entity::{products};
 
 use crate::AppState;
-use crate::services::product_services::{ProductService};
+use crate::application::services::product_services::{ProductService};
+use crate::application::dtos::products::create_product_dto::CreateProductDto;
 
 #[derive(Debug, Serialize)]
 pub struct ProductDto {
@@ -55,16 +56,16 @@ pub async fn get_all_product(data: web::Data<AppState>) -> impl Responder{
     }
 }
 
-#[derive(serde::Deserialize)]
-pub struct CreateProductDto{
+// #[derive(serde::Deserialize)]
+// pub struct CreateProductDto{
 
-    pub name: String,
-    pub price: Decimal,
-    pub description: String,
-    pub stock: i64,
-    pub image_url: String,
-    pub category_id: i32,
-}
+//     pub name: String,
+//     pub price: Decimal,
+//     pub description: String,
+//     pub stock: i64,
+//     pub image_url: String,
+//     pub category_id: i32,
+// }
 
 #[post("/product")]
 pub async fn create_product(
