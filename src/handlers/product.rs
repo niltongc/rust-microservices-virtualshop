@@ -1,33 +1,9 @@
 use actix_web::web::Json;
 use actix_web::{HttpResponse, Responder, delete, get, post, put, web};
 
-use sea_orm::prelude::Decimal;
-use serde::Serialize;
-
-use crate::entity::{products};
-
 use crate::AppState;
 use crate::application::services::product_services::{ProductService};
-use crate::application::dtos::products::create_product_dto::CreateProductDto;
-
-#[derive(Debug, Serialize)]
-pub struct ProductDto {
-    pub id: i32,
-    pub name: String,
-    pub price: Decimal,
-    pub description: String,
-}
-
-impl From<products::Model> for ProductDto {
-    fn from(model: products::Model) -> Self {
-        Self {
-            id: model.id,
-            name: model.name,
-            price: model.price,
-            description: model.description
-        }
-    }
-}
+use crate::application::dtos::products::*;
 
 #[get("/")]
 pub async fn hello() -> impl Responder {
@@ -56,17 +32,6 @@ pub async fn get_all_product(data: web::Data<AppState>) -> impl Responder{
     }
 }
 
-// #[derive(serde::Deserialize)]
-// pub struct CreateProductDto{
-
-//     pub name: String,
-//     pub price: Decimal,
-//     pub description: String,
-//     pub stock: i64,
-//     pub image_url: String,
-//     pub category_id: i32,
-// }
-
 #[post("/product")]
 pub async fn create_product(
     data: web::Data<AppState>,
@@ -78,16 +43,6 @@ pub async fn create_product(
         Ok(product) => HttpResponse::Created().json(product),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
-}
-
-#[derive(serde::Deserialize)]
-pub struct UpdateProductDto{
-    pub name: Option<String>,
-    pub price: Option<Decimal>,
-    pub description: Option<String>,
-    pub stock: Option<i64>,
-    pub image_url: Option<String>,
-    pub category_id: Option<i32>
 }
 
 #[put("/product/{id}")]

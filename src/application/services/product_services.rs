@@ -2,10 +2,8 @@
 use sea_orm::{DbErr};
 use sea_orm::{DatabaseConnection};
 
-use crate::handlers::product::{UpdateProductDto};
-use crate::{handlers::product::ProductDto};
 use crate::repositories::product_repository::ProductRepository;
-use crate::application::dtos::products::create_product_dto::*;
+use crate::application::dtos::products::*;
 pub struct ProductService;
 
 impl ProductService {
